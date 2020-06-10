@@ -1,6 +1,4 @@
 
-// SPDX-License-Identifier: MIT
-
 pragma solidity ^0.6.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol";
@@ -48,7 +46,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Function to set the marketplace fee percentage.
     * @param _percentage uint256 fee to take from purchases.
     */
-    function setMarketplaceFee(uint256 _percentage) public onlyOwner {
+    function setMarketplaceFee(uint256 _percentage)
+        public onlyOwner
+    {
         marketplaceFee = _percentage;
     }
 
@@ -56,7 +56,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Function to set the royalty fee percentage.
     * @param _percentage uint256 royalty fee to take split between seller and creator.
     */
-    function setRoyaltyFee(uint256 _percentage) public onlyOwner {
+    function setRoyaltyFee(uint256 _percentage)
+        public onlyOwner
+    {
         royaltyFee = _percentage;
     }
 
@@ -64,7 +66,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Function to set the primary sale fee percentage.
     * @param _percentage uint256 fee to take from purchases.
     */
-    function setPrimarySaleFee(uint256 _percentage) public onlyOwner {
+    function setPrimarySaleFee(uint256 _percentage)
+        public onlyOwner
+    {
         primarySaleFee = _percentage;
     }
 
@@ -72,7 +76,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Enable or disable the whitelist
     * @param _enabled bool of whether to enable the whitelist.
     */
-    function setEnabledWhitelist(bool _enabled) public onlyOwner {
+    function setEnabledWhitelist(bool _enabled) 
+        public onlyOwner
+    {
         whitelistEnabled = _enabled;
     }
 
@@ -80,7 +86,9 @@ contract Gallery is ERC721, Ownable {
     * @dev batch add addresses to the whitelist
     * @param _addresses address[] of addresses to whitelist.
     */
-    function addToWhitelist(address[] memory _addresses) public onlyOwner {
+    function addToWhitelist(address[] memory _addresses)
+        public onlyOwner
+    {
         // Add all whitelistees.
         for (uint256 i = 0; i < _addresses.length; i++) {
             address _address = _addresses[i];
@@ -95,7 +103,9 @@ contract Gallery is ERC721, Ownable {
     * @dev batch remove addresses from the whitelist
     * @param _addresses address[] of addresses to whitelist.
     */
-    function removeFromWhitelist(address[] memory _addresses) public onlyOwner {
+    function removeFromWhitelist(address[] memory _addresses) 
+        public onlyOwner
+    {
         // Add all whitelistees.
         for (uint256 i = 0; i < _addresses.length; i++) {
             address _address = _addresses[i];
@@ -110,7 +120,9 @@ contract Gallery is ERC721, Ownable {
     * @param _address address to check
     * @return bool
     */
-    function isWhitelisted(address _address) public view returns (bool) {
+    function isWhitelisted(address _address) 
+        public view returns (bool)
+    {
         if (whitelistEnabled) {
             return whitelistMap[_address];
         } else {
@@ -122,7 +134,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Creates a new unique token.
     * @param _uri string metadata uri associated with the token.
     */
-    function createToken(string memory _uri) public {
+    function createToken(string memory _uri)
+        public
+    {
         address _creator = msg.sender;
         require(
             isWhitelisted(_creator),
@@ -164,7 +178,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Checks that the token is owned by the same person who set the sale price.
     * @param _tokenId address of the contract storing the token.
     */
-    function _priceSetterStillOwnsTheToken(uint256 _tokenId) internal view returns (bool) {
+    function _priceSetterStillOwnsTheToken(uint256 _tokenId)
+        internal view returns (bool)
+    {
         ownerOf(_tokenId) == priceSetters[_tokenId];
     }
 
@@ -174,10 +190,7 @@ contract Gallery is ERC721, Ownable {
     * @param _tokenId uint256 ID of the token
     * @param _amount uint256 wei value that the item is for sale
     */
-    function setSalePrice(
-        uint256 _tokenId,
-        uint256 _amount
-    )
+    function setSalePrice(uint256 _tokenId, uint256 _amount)
         public
         ownerMustHaveMarketplaceApproved(_tokenId)
         senderMustBeTokenOwner(_tokenId)
@@ -234,18 +247,10 @@ contract Gallery is ERC721, Ownable {
         }
 
 
-    //     emit Sold(
-    //         msg.sender,
-    //         tokenOwner,
-    //         tokenPrice,
-    //         _tokenId
-    //     );
+        // emit Sold(msg.sender, tokenOwner, tokenPrice, _tokenId);
     }
 
 
-    /////////////////////////////////////////////////////////////////////////
-    // tokenPrice
-    /////////////////////////////////////////////////////////////////////////
     /**
     * @dev Gets the sale price of the token
     * @param _tokenId uint256 ID of the token
@@ -293,10 +298,9 @@ contract Gallery is ERC721, Ownable {
     * @param _amount uint256 value to be split
     * @param _tokenId id of the token
     */
-    function _calcMarketplacePayment(
-        uint256 _amount,
-        uint256 _tokenId
-    ) internal view returns (uint256) {
+    function _calcMarketplacePayment(uint256 _amount, uint256 _tokenId)
+        internal view returns (uint256)
+    {
         uint256 marketplaceFeePayment = _calcMarketplaceFee(_amount);
         bool isPrimarySale = !soldBefore[_tokenId];
         if (isPrimarySale) {
@@ -312,9 +316,7 @@ contract Gallery is ERC721, Ownable {
     * @param _amount uint256 value to be split.
     */
     function _calcMarketplaceFee(uint256 _amount)
-        internal
-        view
-        returns (uint256)
+        internal view returns (uint256)
     {
         return _amount.mul(marketplaceFee).div(100);
     }
@@ -326,10 +328,9 @@ contract Gallery is ERC721, Ownable {
     * @param _amount uint256 value to be split
     * @param _tokenId id of the token
     */
-    function _calcRoyaltyPayment(
-        uint256 _amount,
-        uint256 _tokenId
-    ) internal view returns (uint256) {
+    function _calcRoyaltyPayment(uint256 _amount, uint256 _tokenId) 
+        internal view returns (uint256) 
+    {
         if(soldBefore[_tokenId]) {
             return _amount.mul(royaltyFee).div(100);
         } else {
@@ -345,10 +346,9 @@ contract Gallery is ERC721, Ownable {
     * @param _amount uint256 value to be split
     * @param _tokenId id of the token
     */
-    function _calcSellerPayment(
-        uint256 _amount,
-        uint256 _tokenId
-    ) internal view returns (uint256) {
+    function _calcSellerPayment(uint256 _amount, uint256 _tokenId) 
+        internal view returns (uint256) 
+    {
         if(soldBefore[_tokenId]) {
             return _amount - _calcRoyaltyPayment(_amount,_tokenId);
         } else {
@@ -362,7 +362,9 @@ contract Gallery is ERC721, Ownable {
     *      bidder and reset bid.
     * @param _tokenId uin256 id of the token.
     */
-    function _refundBid(uint256 _tokenId) internal {
+    function _refundBid(uint256 _tokenId) 
+        internal
+    {
         address payable currentBidder = payable(tokenCurrentBidders[_tokenId]);
         uint256 currentBid = tokenCurrentBids[_tokenId];
         uint256 valueToReturn = currentBid + _calcMarketplaceFee(currentBid);
@@ -377,7 +379,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Internal function to reset bid by setting bidder and bid to 0.
     * @param _tokenId uin256 id of the token.
     */
-    function _resetBid(uint256 _tokenId) internal {
+    function _resetBid(uint256 _tokenId)
+        internal
+    {
         tokenCurrentBidders[_tokenId] = address(0);
         tokenCurrentBids[_tokenId] = 0;
     }
@@ -388,11 +392,9 @@ contract Gallery is ERC721, Ownable {
     * @param _bidder address of the bidder.
     * @param _tokenId uin256 id of the token.
     */
-    function _setBid(
-        uint256 _amount,
-        address _bidder,
-        uint256 _tokenId
-    ) internal {
+    function _setBid(uint256 _amount, address _bidder, uint256 _tokenId) 
+        internal
+    {
         // Check bidder not 0 address.
         require(_bidder != address(0), "Bidder cannot be 0 address.");
 
@@ -405,10 +407,9 @@ contract Gallery is ERC721, Ownable {
     * @param _bidder address that may have a current bid.
     * @param _tokenId uin256 id of the token.
     */
-    function _addressHasBidOnToken(
-        address _bidder,
-        uint256 _tokenId
-    ) internal view returns (bool) {
+    function _addressHasBidOnToken(address _bidder, uint256 _tokenId) 
+        internal view returns (bool) 
+    {
         return tokenCurrentBidders[_tokenId] == _bidder;
     }
 
@@ -418,9 +419,7 @@ contract Gallery is ERC721, Ownable {
     * @param _tokenId uin256 id of the token.
     */
     function _tokenHasBid(uint256 _tokenId)
-        internal
-        view
-        returns (bool)
+        internal view returns (bool)
     {
         return tokenCurrentBidders[_tokenId] != address(0);
     }
@@ -431,11 +430,9 @@ contract Gallery is ERC721, Ownable {
     * @param _originContract address of the token contract.
     * @param _tokenId uint256 ID of the token.
     */
-    function _payout(
-        uint256 _amount,
-        address payable _seller,
-        uint256 _tokenId
-    ) private {
+    function _payout(uint256 _amount, address payable _seller, uint256 _tokenId) 
+        private
+    {
         address payable maintainer = payable(this.owner());
         address payable creator = payable(tokenCreators[_tokenId]);
 
@@ -459,10 +456,10 @@ contract Gallery is ERC721, Ownable {
     * @param _newBidAmount uint256 value in wei to bid, plus marketplace fee.
     * @param _tokenId uint256 ID of the token
     */
-    function bid(
-        uint256 _newBidAmount,
-        uint256 _tokenId
-    ) public payable {
+    function bid(uint256 _newBidAmount, uint256 _tokenId) 
+        public payable 
+        ownerMustHaveMarketplaceApproved( _tokenId)
+    {
         // Check that bid is greater than 0.
         require(_newBidAmount > 0, "Cannot bid 0 Wei.");
 
@@ -523,13 +520,7 @@ contract Gallery is ERC721, Ownable {
         // set the token as sold
         _setTokenAsSold(_tokenId);
 
-        // emit AcceptBid(
-        //     _originContract,
-        //     bidder,
-        //     msg.sender,
-        //     bidAmount,
-        //     _tokenId
-        // );
+        // emit AcceptBid(bidder, msg.sender, bidAmount, _tokenId);
     }
 
 
@@ -537,7 +528,9 @@ contract Gallery is ERC721, Ownable {
     * @dev Cancel the bid on the token.
     * @param _tokenId uint256 ID of the token.
     */
-    function cancelBid(uint256 _tokenId) public {
+    function cancelBid(uint256 _tokenId) 
+        public 
+    {
         // Check that sender has a current bid.
         address bidder = msg.sender;
         require(
@@ -557,9 +550,7 @@ contract Gallery is ERC721, Ownable {
     * @param _tokenId uin256 id of the token.
     */
     function currentBidDetailsOfToken(uint256 _tokenId)
-        public
-        view
-        returns (uint256, address)
+        public view returns (uint256, address)
     {
         return (
             tokenCurrentBids[_tokenId],
