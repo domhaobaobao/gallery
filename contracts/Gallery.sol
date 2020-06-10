@@ -1,8 +1,8 @@
 
 pragma solidity ^0.6.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/d9fa59f30a27f095c48b09555106fed0200654e0/contracts/token/ERC721/ERC721.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/d9fa59f30a27f095c48b09555106fed0200654e0/contracts/access/Ownable.sol";
 
 contract Gallery is ERC721, Ownable {
 
