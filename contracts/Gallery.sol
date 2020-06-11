@@ -458,7 +458,6 @@ contract Gallery is ERC721, Ownable {
     */
     function bid(uint256 _newBidAmount, uint256 _tokenId) 
         public payable 
-        ownerMustHaveMarketplaceApproved( _tokenId)
     {
         // Check that bid is greater than 0.
         require(_newBidAmount > 0, "Cannot bid 0 Wei.");
