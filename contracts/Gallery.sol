@@ -183,7 +183,7 @@ contract Gallery is ERC721, Ownable {
     function _priceSetterStillOwnsTheToken(uint256 _tokenId)
         internal view returns (bool)
     {
-        ownerOf(_tokenId) == priceSetters[_tokenId];
+        return ownerOf(_tokenId) == priceSetters[_tokenId];
     }
 
 
@@ -259,9 +259,7 @@ contract Gallery is ERC721, Ownable {
     * @return sale price of the token
     */
     function tokenPrice(uint256 _tokenId)
-        public
-        view
-        returns (uint256)
+        public view returns (uint256)
     {
         if (_priceSetterStillOwnsTheToken(_tokenId)) {
             return tokenPrices[_tokenId];
