@@ -151,14 +151,17 @@ contract Gallery is ERC721, Ownable {
     }
 
 
-    /* @dev Checks that the token owner is approved for the ERC721Market
+    /*
+    * @dev Checks that the token owner or the token ID is approved for the Market
     * @param _tokenId uint256 ID of the token
     */
     modifier ownerMustHaveMarketplaceApproved(uint256 _tokenId) {
         address owner = ownerOf(_tokenId);
+        address marketplace = address(this);
         require(
-            isApprovedForAll(owner, address(this)),
-            "owner must have approved contract"
+            isApprovedForAll(owner, marketplace) ||
+            getApproved(_tokenId) == marketplace,
+            "owner must have approved marketplace"
         );
         _;
     }
@@ -199,7 +202,7 @@ contract Gallery is ERC721, Ownable {
     {
         tokenPrices[_tokenId] = _amount;
         priceSetters[_tokenId] = msg.sender;
-        // emit SetSalePrice(_originContract, _amount, _tokenId);
+        // emit SetSalePrice(_amount, _tokenId);
     }
 
 
@@ -208,8 +211,7 @@ contract Gallery is ERC721, Ownable {
     * @param _tokenId uint256 ID of the token.
     */
     function buy(uint256 _tokenId)
-        public
-        payable
+        public payable
         ownerMustHaveMarketplaceApproved(_tokenId)
     {
         // Check that the person who set the price still owns the token.
@@ -222,10 +224,9 @@ contract Gallery is ERC721, Ownable {
         uint256 tokenPrice = tokenPrices[_tokenId];
         require(tokenPrice > 0, "Tokens priced at 0 are not for sale.");
 
-        // Check that enough ether was sent.
-        uint256 requiredCost = tokenPrice + _calcMarketplaceFee(tokenPrice);
+        // Check that the correct ether was sent.
         require(
-            requiredCost == msg.value,
+            tokenPrice == msg.value,
             "Must purchase the token for the correct price"
         );
 
@@ -269,7 +270,7 @@ contract Gallery is ERC721, Ownable {
 
     /*
     * @dev Internal function to set a token as sold.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _setTokenAsSold(uint256 _tokenId)
         internal
@@ -281,7 +282,7 @@ contract Gallery is ERC721, Ownable {
     }
 
     /* @dev Internal function to set token price to 0 for a give contract.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _resetTokenPrice(uint256 _tokenId)
         internal
@@ -291,93 +292,24 @@ contract Gallery is ERC721, Ownable {
     }
 
 
-    /*
-    * @dev Internal function to calculate Marketplace fees.
-    *      If primary sale:  fee + split with seller
-          otherwise:        just fee.
-    * @param _amount uint256 value to be split
-    * @param _tokenId id of the token
-    */
-    function _calcMarketplacePayment(uint256 _amount, uint256 _tokenId)
-        internal view returns (uint256)
-    {
-        uint256 marketplaceFeePayment = _calcMarketplaceFee(_amount);
-        bool isPrimarySale = !soldBefore[_tokenId];
-        if (isPrimarySale) {
-            uint256 primarySalePayment = _amount.mul(primarySaleFee).div(100);
-            return marketplaceFeePayment + primarySalePayment;
-        }
-        return marketplaceFeePayment;
-    }
-
-    /*
-    * @dev Internal function calculate marketplace fee for a given amount.
-    *      f(_amount) =  _amount * (fee % / 100)
-    * @param _amount uint256 value to be split.
-    */
-    function _calcMarketplaceFee(uint256 _amount)
-        internal view returns (uint256)
-    {
-        return _amount.mul(marketplaceFee).div(100);
-    }
-
-    /*
-    * @dev Internal function to calculate royalty payment.
-    *      If primary sale: 0
-    *      otherwise:       artist royalty.
-    * @param _amount uint256 value to be split
-    * @param _tokenId id of the token
-    */
-    function _calcRoyaltyPayment(uint256 _amount, uint256 _tokenId) 
-        internal view returns (uint256) 
-    {
-        if(soldBefore[_tokenId]) {
-            return _amount.mul(royaltyFee).div(100);
-        } else {
-            return(0);
-        }
-    }
-
-
-    /*
-    * @dev Internal function to calculate seller payment.
-    *      If primary sale: _amount - split with marketplace,
-    *      otherwise:       _amount - artist royalty.
-    * @param _amount uint256 value to be split
-    * @param _tokenId id of the token
-    */
-    function _calcSellerPayment(uint256 _amount, uint256 _tokenId) 
-        internal view returns (uint256) 
-    {
-        if(soldBefore[_tokenId]) {
-            return _amount - _calcRoyaltyPayment(_amount,_tokenId);
-        } else {
-            return _amount - _amount.mul(primarySaleFee).div(100);
-        }
-
-    }
-
-
     /* @dev Internal function to return an existing bid on a token to the
     *      bidder and reset bid.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _refundBid(uint256 _tokenId) 
         internal
     {
         address payable currentBidder = payable(tokenCurrentBidders[_tokenId]);
-        uint256 currentBid = tokenCurrentBids[_tokenId];
-        uint256 valueToReturn = currentBid + _calcMarketplaceFee(currentBid);
         if (currentBidder == address(0)) {
             return;
         }
         _resetBid( _tokenId);
-        currentBidder.transfer(valueToReturn);
+        currentBidder.transfer(tokenCurrentBids[_tokenId]);
     }
 
     /*
     * @dev Internal function to reset bid by setting bidder and bid to 0.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _resetBid(uint256 _tokenId)
         internal
@@ -390,7 +322,7 @@ contract Gallery is ERC721, Ownable {
     * @dev Internal function to set a bid.
     * @param _amount uint256 value in wei to bid. Does not include marketplace fee.
     * @param _bidder address of the bidder.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _setBid(uint256 _amount, address _bidder, uint256 _tokenId) 
         internal
@@ -405,7 +337,7 @@ contract Gallery is ERC721, Ownable {
 
     /* @dev Internal function see if the given address has an existing bid on a token.
     * @param _bidder address that may have a current bid.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _addressHasBidOnToken(address _bidder, uint256 _tokenId) 
         internal view returns (bool) 
@@ -416,7 +348,7 @@ contract Gallery is ERC721, Ownable {
 
     /*
     * @dev Internal function see if the token has an existing bid.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function _tokenHasBid(uint256 _tokenId)
         internal view returns (bool)
@@ -427,7 +359,6 @@ contract Gallery is ERC721, Ownable {
     /* @dev Internal function to pay the seller, creator, and maintainer.
     * @param _amount uint256 value to be split.
     * @param _seller address seller of the token.
-    * @param _originContract address of the token contract.
     * @param _tokenId uint256 ID of the token.
     */
     function _payout(uint256 _amount, address payable _seller, uint256 _tokenId) 
@@ -436,19 +367,66 @@ contract Gallery is ERC721, Ownable {
         address payable maintainer = payable(this.owner());
         address payable creator = payable(tokenCreators[_tokenId]);
 
-        uint256 marketplacePayment = _calcMarketplacePayment(_amount,_tokenId);
-        uint256 sellerPayment = _calcSellerPayment(_amount,_tokenId);
-        uint256 royaltyPayment = _calcRoyaltyPayment(_amount, _tokenId);
+        bool isPrimarySale = !soldBefore[_tokenId];
+
+        uint256 marketplacePayment = _calcMarketplacePayment(isPrimarySale, _amount);
+        uint256 royaltyPayment = _calcRoyaltyPayment(isPrimarySale, _amount);
+        uint256 sellerPayment = _amount - marketplacePayment - royaltyPayment;
 
         if (marketplacePayment > 0) {
             maintainer.transfer(marketplacePayment);
         }
-        if (sellerPayment > 0) {
-            _seller.transfer(sellerPayment);
-        }
         if (royaltyPayment > 0) {
             creator.transfer(royaltyPayment);
         }
+        if (sellerPayment > 0) {
+            _seller.transfer(sellerPayment);
+        }
+    }
+
+    /*
+    * @dev Internal function to calculate Marketplace fees.
+    *      If primary sale:  fee + split with seller
+          otherwise:        just fee.
+    * @param _isPrimarySale true if the token has not been sold before
+    * @param _amount uint256 value to be split
+    */
+    function _calcMarketplacePayment(bool _isPrimarySale, uint256 _amount)
+        internal view returns (uint256)
+    {
+        if (_isPrimarySale) {
+            return _calcProportion(marketplaceFee, _amount) +
+                   _calcProportion(primarySaleFee, _amount);
+        }
+        return _calcProportion(marketplaceFee, _amount);
+    }
+
+    /*
+    * @dev Internal function to calculate royalty payment.
+    *      If primary sale: 0
+    *      otherwise:       artist royalty.
+    * @param _isPrimarySale true if the token has not been sold before
+    * @param _amount uint256 value to be split
+    */
+    function _calcRoyaltyPayment(bool _isPrimarySale, uint256 _amount)
+        internal view returns (uint256)
+    {
+        if(_isPrimarySale) {
+            return 0;
+        } else {
+            return _calcProportion(royaltyFee, _amount);
+        }
+    }
+
+    /*
+    * @dev Internal function calculate proportion of a fee for a given amount.
+    *      _amount * fee / 100
+    * @param _amount uint256 value to be split.
+    */
+    function _calcProportion(uint256 fee, uint256 _amount)
+        internal pure returns (uint256)
+    {
+        return _amount.mul(fee).div(100);
     }
 
     /*
@@ -456,37 +434,30 @@ contract Gallery is ERC721, Ownable {
     * @param _newBidAmount uint256 value in wei to bid, plus marketplace fee.
     * @param _tokenId uint256 ID of the token
     */
-    function bid(uint256 _newBidAmount, uint256 _tokenId) 
+    function bid(uint256 _tokenId)
         public payable 
     {
-        // Check that bid is greater than 0.
-        require(_newBidAmount > 0, "Cannot bid 0 Wei.");
 
-        // Check that bid is higher than previous bid
-        uint256 currentBidAmount = tokenCurrentBids[_tokenId];
+        uint256 _newBid = msg.value;
+        address _newBidder = msg.sender;
+
         require(
-            _newBidAmount > currentBidAmount,
+            _newBid > tokenCurrentBids[_tokenId],
             "Must place higher bid than existing bid."
         );
 
-        // Check that enough ether was sent.
-        uint256 requiredCost = _newBidAmount + _calcMarketplaceFee(_newBidAmount);
         require(
-            requiredCost == msg.value,
-            "Must purchase the token for the correct price."
+            _newBidder != ownerOf(_tokenId),
+            "Bidder cannot be owner."
         );
-
-        // Check that bidder is not owner.
-        address bidder = msg.sender;
-        require(ownerOf(_tokenId) != bidder, "Bidder cannot be owner.");
 
         // Refund previous bidder.
         _refundBid( _tokenId);
 
         // Set the new bid.
-        _setBid(_newBidAmount, bidder, _tokenId);
+        _setBid(_newBid, _newBidder, _tokenId);
 
-        // emit Bid(_originContract, bidder, _newBidAmount, _tokenId);
+        // emit Bid(bidder, _newBid, _tokenId);
     }
 
 
@@ -541,12 +512,12 @@ contract Gallery is ERC721, Ownable {
         _refundBid(_tokenId);
 
         // uint256 bidAmount = tokenCurrentBids[_tokenId];
-        // emit CancelBid(_originContract, bidder, bidAmount, _tokenId);
+        // emit CancelBid(bidder, bidAmount, _tokenId);
     }
 
     /*
     * @dev Function to get current bid and bidder of a token.
-    * @param _tokenId uin256 id of the token.
+    * @param _tokenId uint256 id of the token.
     */
     function currentBidDetailsOfToken(uint256 _tokenId)
         public view returns (uint256, address)
