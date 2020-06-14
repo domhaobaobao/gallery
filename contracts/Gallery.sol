@@ -91,7 +91,7 @@ contract Gallery is ERC721, Ownable {
     function addToWhitelist(address[] memory _addresses)
         public onlyOwner
     {
-        // Add all whitelistees.
+        // Add all _addresses.
         for (uint256 i = 0; i < _addresses.length; i++) {
             address _address = _addresses[i];
             if (!isWhitelisted(_address)) {
@@ -108,7 +108,7 @@ contract Gallery is ERC721, Ownable {
     function removeFromWhitelist(address[] memory _addresses) 
         public onlyOwner
     {
-        // Add all whitelistees.
+        // Add all _addresses.
         for (uint256 i = 0; i < _addresses.length; i++) {
             address _address = _addresses[i];
             if (isWhitelisted(_address)) {
@@ -291,70 +291,7 @@ contract Gallery is ERC721, Ownable {
         priceSetters[_tokenId] = address(0);
     }
 
-
-    /* @dev Internal function to return an existing bid on a token to the
-    *      bidder and reset bid.
-    * @param _tokenId uint256 id of the token.
-    */
-    function _refundBid(uint256 _tokenId) 
-        internal
-    {
-        address payable currentBidder = payable(tokenCurrentBidders[_tokenId]);
-        if (currentBidder == address(0)) {
-            return;
-        }
-        _resetBid( _tokenId);
-        currentBidder.transfer(tokenCurrentBids[_tokenId]);
-    }
-
-    /*
-    * @dev Internal function to reset bid by setting bidder and bid to 0.
-    * @param _tokenId uint256 id of the token.
-    */
-    function _resetBid(uint256 _tokenId)
-        internal
-    {
-        tokenCurrentBidders[_tokenId] = address(0);
-        tokenCurrentBids[_tokenId] = 0;
-    }
-
-    /*
-    * @dev Internal function to set a bid.
-    * @param _amount uint256 value in wei to bid. Does not include marketplace fee.
-    * @param _bidder address of the bidder.
-    * @param _tokenId uint256 id of the token.
-    */
-    function _setBid(uint256 _amount, address _bidder, uint256 _tokenId) 
-        internal
-    {
-        // Check bidder not 0 address.
-        require(_bidder != address(0), "Bidder cannot be 0 address.");
-
-        // Set bid.
-        tokenCurrentBidders[_tokenId] = _bidder;
-        tokenCurrentBids[_tokenId] = _amount;
-    }
-
-    /* @dev Internal function see if the given address has an existing bid on a token.
-    * @param _bidder address that may have a current bid.
-    * @param _tokenId uint256 id of the token.
-    */
-    function _addressHasBidOnToken(address _bidder, uint256 _tokenId) 
-        internal view returns (bool) 
-    {
-        return tokenCurrentBidders[_tokenId] == _bidder;
-    }
-
-
-    /*
-    * @dev Internal function see if the token has an existing bid.
-    * @param _tokenId uint256 id of the token.
-    */
-    function _tokenHasBid(uint256 _tokenId)
-        internal view returns (bool)
-    {
-        return tokenCurrentBidders[_tokenId] != address(0);
-    }
+    /////////////////////////////// PAYOUT SECTION ///////////////////////////////////////
 
     /* @dev Internal function to pay the seller, creator, and maintainer.
     * @param _amount uint256 value to be split.
@@ -429,6 +366,9 @@ contract Gallery is ERC721, Ownable {
         return _amount.mul(fee).div(100);
     }
 
+
+    /////////////////////////////// AUCTION SECTION ///////////////////////////////////////
+
     /*
     * @dev Bids on the token, replacing the bid if the bid is higher than the current bid. You cannot bid on a token you already own.
     * @param _newBidAmount uint256 value in wei to bid, plus marketplace fee.
@@ -493,7 +433,6 @@ contract Gallery is ERC721, Ownable {
         // emit AcceptBid(bidder, msg.sender, bidAmount, _tokenId);
     }
 
-
     /*
     * @dev Cancel the bid on the token.
     * @param _tokenId uint256 ID of the token.
@@ -528,5 +467,67 @@ contract Gallery is ERC721, Ownable {
         );
     }
 
+    /* @dev Internal function to return an existing bid on a token to the
+    *      bidder and reset bid.
+    * @param _tokenId uint256 id of the token.
+    */
+    function _refundBid(uint256 _tokenId)
+        internal
+    {
+        address payable currentBidder = payable(tokenCurrentBidders[_tokenId]);
+        if (currentBidder == address(0)) {
+            return;
+        }
+        _resetBid( _tokenId);
+        currentBidder.transfer(tokenCurrentBids[_tokenId]);
+    }
+
+    /*
+    * @dev Internal function to reset bid by setting bidder and bid to 0.
+    * @param _tokenId uint256 id of the token.
+    */
+    function _resetBid(uint256 _tokenId)
+        internal
+    {
+        tokenCurrentBidders[_tokenId] = address(0);
+        tokenCurrentBids[_tokenId] = 0;
+    }
+
+    /*
+    * @dev Internal function to set a bid.
+    * @param _amount uint256 value in wei to bid. Does not include marketplace fee.
+    * @param _bidder address of the bidder.
+    * @param _tokenId uint256 id of the token.
+    */
+    function _setBid(uint256 _amount, address _bidder, uint256 _tokenId)
+        internal
+    {
+        // Check bidder not 0 address.
+        require(_bidder != address(0), "Bidder cannot be 0 address.");
+
+        // Set bid.
+        tokenCurrentBidders[_tokenId] = _bidder;
+        tokenCurrentBids[_tokenId] = _amount;
+    }
+
+    /* @dev Internal function see if the given address has an existing bid on a token.
+    * @param _bidder address that may have a current bid.
+    * @param _tokenId uint256 id of the token.
+    */
+    function _addressHasBidOnToken(address _bidder, uint256 _tokenId)
+        internal view returns (bool)
+    {
+        return tokenCurrentBidders[_tokenId] == _bidder;
+    }
+
+    /*
+    * @dev Internal function see if the token has an existing bid.
+    * @param _tokenId uint256 id of the token.
+    */
+    function _tokenHasBid(uint256 _tokenId)
+        internal view returns (bool)
+    {
+        return tokenCurrentBidders[_tokenId] != address(0);
+    }
 
 }
