@@ -12,7 +12,7 @@ A digital art gallery on Ethereum inspired by SuperRare
 
 In collaboration with MoCDA Lab 
 
-[![MoCDA](https://everknow.it/img/mocda.jpeg "The Museum of Contemporary Digital Art")](https://mocda.org)
+[<img src="https://everknow.it/img/mocda.jpeg" width=250 height=250 title="The Museum of Contemporary Digital Art">](https://mocda.org)
 
 & the most successful crypto gallery
 
