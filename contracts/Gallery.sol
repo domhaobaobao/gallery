@@ -236,7 +236,7 @@ contract Gallery is ERC721, Ownable {
         _payout(tokenPrice, payable(tokenOwner), _tokenId);
 
         // Transfer token.
-        safeTransferFrom(tokenOwner, msg.sender, _tokenId);
+        _transfer(tokenOwner, msg.sender, _tokenId);
 
         // Wipe the token price.
         _resetTokenPrice(_tokenId);
