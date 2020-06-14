@@ -8,7 +8,7 @@ A digital art gallery on Ethereum inspired by SuperRare
 
 [Open the Remix IDE](https://remix.ethereum.org)
 
-[Join the tweet](https://twitter.com/search?q=mocda_)
+[Join the tweet](https://twitter.com/MOCDA_/status/1272166922164076544?s=20)
 
 In collaboration with MoCDA Lab
 
