@@ -193,9 +193,20 @@ contract Gallery is ERC721, Ownable {
     /*
     * @dev Set the token for sale
     * @param _tokenId uint256 ID of the token
-    * @param _amount uint256 wei value that the item is for sale
+    * @param _amount uint256 ether value that the item is for sale
     */
     function setSalePrice(uint256 _tokenId, uint256 _amount)
+        public
+    {
+        setWeiSalePrice(_tokenId, _amount.mul(1000000000000000000));
+    }
+
+    /*
+    * @dev Set the token for sale
+    * @param _tokenId uint256 ID of the token
+    * @param _amount uint256 wei value that the item is for sale
+    */
+    function setWeiSalePrice(uint256 _tokenId, uint256 _amount)
         public
         ownerMustHaveMarketplaceApproved(_tokenId)
         senderMustBeTokenOwner(_tokenId)
