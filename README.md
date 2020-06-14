@@ -7,3 +7,17 @@ A digital art gallery on Ethereum inspired by SuperRare
 [See the Gallery code](contracts/Gallery.sol)
 
 [Open the Remix IDE](https://remix.ethereum.org)
+
+[Join the tweet](https://twitter.com/search?q=mocda_)
+
+In collaboration with MoCDA Lab
+
+& the most successful crypto gallery
+
+& the research digital enterprise
+
+[![EverKnow Limited](https://everknow.it/img/EK-logo.png "EverKnow Limited")](https://www.everknow.it)
+
+& the leading event streamer for non fungible tokens projects
+
+& the leading contemporary digital art fair
