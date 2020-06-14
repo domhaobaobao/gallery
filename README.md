@@ -24,7 +24,7 @@ In collaboration with MoCDA Lab
 
 & the leading event streamer for non fungible tokens projects
 
-[<img src="https://everknow.it/img/nft-london.jpeg" width=400 height=173 title="NFT London">](https://www.everknow.it)
+[<img src="https://everknow.it/img/nft-london.jpeg" width=400 height=173 title="NFT London">](https://www.meetup.com/NFT-London/)
 
 & the leading contemporary digital art fair
 
