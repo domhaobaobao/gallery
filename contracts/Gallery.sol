@@ -489,8 +489,8 @@ contract Gallery is ERC721, Ownable {
         if (currentBidder == address(0)) {
             return;
         }
-        _resetBid( _tokenId);
         currentBidder.transfer(tokenCurrentBids[_tokenId]);
+        _resetBid( _tokenId);
     }
 
     /*
