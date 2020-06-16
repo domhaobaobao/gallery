@@ -2,6 +2,12 @@
 A digital art gallery on Ethereum inspired by SuperRare
 -------------------------------------------------------
 
+## NOTE 
+
+**The Gallery smart contract included in this repository is a simplified version of the smart contracts operating behind the scenes in the SuperRare dapp. It is intended to be used only for educational purpose in the context of the MoCDALab series of workshops. It can be deployed and tested in the Remix IDE as explained in the series of videos shared in the tweet below.**
+
+For more info please consult the associated [LICENSE](LICENSE)
+
 [See the Diagram](https://everknow.it/img/SuperRare.svg)
 
 [See the Gallery code](contracts/Gallery.sol)
