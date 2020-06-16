@@ -486,11 +486,12 @@ contract Gallery is ERC721, Ownable {
         internal
     {
         address payable currentBidder = payable(tokenCurrentBidders[_tokenId]);
+        uint256 _amountToRefund = tokenCurrentBids[_tokenId];
         if (currentBidder == address(0)) {
             return;
         }
-        currentBidder.transfer(tokenCurrentBids[_tokenId]);
         _resetBid( _tokenId);
+        currentBidder.transfer(_amountToRefund);
     }
 
     /*
