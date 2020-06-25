@@ -17,7 +17,7 @@ For more info please consult the associated [LICENSE](LICENSE) and [Introduction
 
 [Join the tweet to submit questions or suggestions!](https://twitter.com/MOCDA_/status/1276229239617044480?s=20)
 
-[Watch the video](https://www.youtube.com/watch?v=hUVJhRvcYxo&t=1420s)
+[Watch the video](https://www.youtube.com/watch?v=hUVJhRvcYxo)
 
 
 
