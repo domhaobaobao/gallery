@@ -15,7 +15,9 @@ For more info please consult the associated [LICENSE](LICENSE) and [Introduction
 
 [Open the Remix IDE](https://remix.ethereum.org)
 
-[Join the tweet](https://twitter.com/MOCDA_/status/1272166922164076544?s=20)
+[Join the tweet](https://twitter.com/MOCDA_/status/1276229239617044480?s=20) to submit questions or suggestions!
+
+[Watch the video](https://www.youtube.com/watch?v=hUVJhRvcYxo&t=1420s)
 
 
 
